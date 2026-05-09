@@ -46,6 +46,61 @@
     --shadow:        0 1px 3px rgba(0,0,0,0.4);
 }
 
+/* --- 计时模式深色主题 --- */
+[data-timer] {
+    --bg: #0a0a0a;
+    --card-bg: #141414;
+    --text: #e0e0e0;
+    --text-secondary: #888;
+    --border: #2a2a2a;
+    --tint: #00c853;
+    --tint-hover: #00e676;
+    --green: #00c853;
+    --red: #ff1744;
+    --nav-bg: rgba(10,10,10,0.96);
+    --key-white: #e0e0e0;
+    --key-black: #0a0a0a;
+    --tag-bg: #0d3318;
+    --tag-text: #00c853;
+    --highlight: #336600;
+}
+
+/* --- 计时模式切换（复用 mode-btn 样式） --- */
+#timer-mode-selector {
+    display: flex; gap: 4px; margin-bottom: 12px;
+    background: var(--border); border-radius: var(--radius); padding: 3px;
+}
+#timer-mode-selector .mode-btn.active {
+    background: var(--green); color: #000;
+}
+
+/* --- 倒计时 --- */
+#timer-countdown {
+    font-size: 40px; font-weight: 700; text-align: center;
+    font-variant-numeric: tabular-nums; margin: 8px 0;
+    font-family: "SF Mono", "Fira Code", monospace;
+    color: var(--tint);
+}
+#timer-countdown.warning {
+    color: var(--red);
+    animation: timerPulse 0.5s ease-in-out;
+}
+@keyframes timerPulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* --- 能量条 --- */
+#energy-bars {
+    display: flex; gap: 8px; justify-content: center; margin-bottom: 8px;
+    width: 100%;
+}
+.energy-bar {
+    flex: 1; height: 18px; border-radius: 9px;
+    background: #333; transition: background 0.2s;
+}
+.energy-bar.filled { background: var(--green); }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -180,7 +235,7 @@ body {
     display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
 }
 .diff-btn {
-    flex: 1; min-width: 60px; padding: 10px 8px; font-size: 13px; font-weight: 600;
+    flex: 1; min-width: 48px; padding: 8px 4px; font-size: 12px; font-weight: 600;
     background: var(--card-bg); color: var(--text);
     border: 2px solid var(--border); border-radius: var(--radius);
     cursor: pointer; min-height: 44px; text-align: center;
@@ -237,37 +292,49 @@ body {
    钢琴键盘
    ======================================== */
 #piano-container {
-    overflow-x: auto; margin: 12px 0; padding: 8px 0;
+    overflow-x: auto; margin: 12px auto; padding: 8px 0;
     -webkit-overflow-scrolling: touch;
+    display: flex; justify-content: center;
 }
 #piano {
     display: flex; position: relative;
-    min-width: max-content; margin: 0 auto;
+    margin: 0 auto;
     height: 140px; /* default medium */
 }
 #piano.size-small { height: 100px; }
 #piano.size-large { height: 180px; }
 
 .white-key {
-    width: 36px; height: 100%; background: var(--key-white);
-    border: 1px solid #ccc; border-radius: 0 0 4px 4px;
+    height: 100%; background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+    border: 1px solid #ccc; border-radius: 0 0 6px 6px;
+    border-top: 1px solid #ddd;
     cursor: pointer; position: relative;
     display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 6px; font-size: 9px; color: #999;
+    padding-bottom: 8px; font-size: 9px; color: #999;
     transition: background 0.1s;
-    min-width: 36px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
 }
-.white-key:active { background: #e5e5ea; }
+.white-key:active { background: linear-gradient(180deg, #e5e5ea 0%, #dcdce0 100%); }
 .white-key.highlight { background: var(--tint); color: #fff; }
 
+[data-theme="dark"] .white-key {
+    background: linear-gradient(180deg, #e8e8ed 0%, #d0d0d5 100%);
+}
+[data-theme="dark"] .white-key:active {
+    background: linear-gradient(180deg, #c0c0c5 0%, #b0b0b5 100%);
+}
+
 .black-key {
-    width: 24px; height: 58%; background: var(--key-black);
-    border-radius: 0 0 3px 3px; cursor: pointer;
+    background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
+    border-radius: 0 0 4px 4px; cursor: pointer;
     position: absolute; z-index: 2;
     transition: background 0.1s;
+    border: 1px solid #000;
+    border-top: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
 }
-.black-key:active { background: #3a3a3c; }
-.black-key.highlight { background: var(--tint); }
+.black-key:active { background: linear-gradient(180deg, #3a3a3c 0%, #2c2c2e 100%); }
+.black-key.highlight { background: var(--tint); box-shadow: 0 0 8px rgba(0,122,255,0.5); }
 
 /* ========================================
    学习页面
@@ -318,10 +385,57 @@ body {
 }
 .toast.show { opacity: 1; }
 
+/* 滑钮：蓝色填充轨道 */
+#arpeggio-slider {
+    -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px;
+    background: var(--border);
+    outline: none;
+}
+#arpeggio-slider::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 3px;
+}
+#arpeggio-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--tint); cursor: pointer;
+    margin-top: -5px;
+    border: none;
+}
+#arpeggio-slider::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--tint); cursor: pointer;
+    border: none;
+}
+#arpeggio-slider::-moz-range-track {
+    height: 6px; border-radius: 3px;
+    background: var(--border);
+}
+#arpeggio-slider::-moz-range-progress {
+    height: 6px; border-radius: 3px;
+    background: var(--tint);
+}
+
+/* 中文提示开关 */
+.toggle-switch {
+    position: relative; width: 51px; height: 32px;
+    background: var(--border); border-radius: 16px;
+    cursor: pointer; transition: background 0.2s;
+    border: 2px solid var(--border); flex-shrink: 0;
+    background-clip: padding-box; min-height: 32px;
+    -webkit-tap-highlight-color: transparent;
+}
+.toggle-switch.active { background: var(--tint); border-color: var(--tint); }
+.toggle-switch::after {
+    content: ''; position: absolute; top: 2px; left: 3px;
+    width: 24px; height: 24px; background: #fff; border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch.active::after { transform: translateX(17px); }
+
 /* 小屏幕适配 */
 @media (max-width: 360px) {
-    .white-key { width: 28px; min-width: 28px; }
-    .black-key { width: 20px; }
     #chord-options { grid-template-columns: 1fr; }
 }
 </style>
@@ -342,13 +456,10 @@ body {
      ======================================== -->
 <div class="page active" id="page-practice">
 
-    <!-- 难度选择 -->
-    <div class="section-title">难度级别</div>
-    <div id="difficulty-selector">
-        <button class="diff-btn active" data-diff="0">初级</button>
-        <button class="diff-btn locked" data-diff="1">中级 🔒</button>
-        <button class="diff-btn locked" data-diff="2">高级 🔒</button>
-        <button class="diff-btn locked" data-diff="3">专业级 🔒</button>
+    <!-- 计时模式切换 -->
+    <div id="timer-mode-selector">
+        <button class="mode-btn active" data-timer="false">无尽模式</button>
+        <button class="mode-btn" data-timer="true">计时模式</button>
     </div>
 
     <!-- 模式切换 -->
@@ -361,30 +472,67 @@ body {
     <!-- 练习区 -->
     <div id="practice-area">
         <div id="score-display">
-            <span>得分 <strong id="score-val">0</strong></span>
             <span>连续 <strong id="streak-val">0</strong></span>
             <span>正确率 <strong id="rate-val">-</strong></span>
         </div>
 
+        <!-- 计时模式元素 -->
+        <div id="timer-elements" style="display:none;">
+            <div id="timer-countdown">30.00</div>
+            <div style="text-align:center;font-size:14px;margin-bottom:8px;">答对: <strong id="timer-score-val">0</strong> 题</div>
+            <div id="energy-bars">
+                <div class="energy-bar"></div>
+                <div class="energy-bar"></div>
+                <div class="energy-bar"></div>
+            </div>
+        </div>
+        <div id="timer-result" style="display:none;text-align:center;">
+            <div style="font-size:24px;font-weight:700;margin:16px 0;">时间到！</div>
+            <div style="font-size:18px;margin-bottom:16px;">答对 <strong id="timer-final-score">0</strong> 题</div>
+            <button class="btn btn-primary btn-large" id="timer-retry-btn">再来一局</button>
+        </div>
+
         <!-- 和弦听辨区 -->
         <div id="chord-section">
+            <!-- 难度选择（仅和弦模式显示） -->
+            <div class="section-title">难度级别</div>
+            <div id="difficulty-selector">
+                <button class="diff-btn active" data-diff="0">初级</button>
+                <button class="diff-btn locked" data-diff="1">中级 🔒</button>
+                <button class="diff-btn locked" data-diff="2">高级 🔒</button>
+                <button class="diff-btn locked" data-diff="3">专业级 🔒</button>
+                <button class="diff-btn locked" data-diff="4">混合 🔒</button>
+            </div>
             <button class="btn btn-outline btn-large" id="replay-btn">🔊 播放和弦</button>
-            <div id="feedback"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap;">
+                <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">音符间隔</span>
+                <input type="range" id="arpeggio-slider" min="0" max="80" value="0" style="flex:1;min-width:80px;">
+                <span style="font-size:11px;color:var(--text-secondary);width:36px;text-align:right;" id="arpeggio-label">0ms</span>
+                <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;margin-left:8px;">中文提示</span>
+                <div class="toggle-switch active" id="hint-toggle" style="flex-shrink:0;"></div>
+            </div>
             <div id="chord-options"></div>
+            <div id="feedback"></div>
         </div>
 
         <!-- 单音听辨区 -->
         <div id="note-section" style="display:none;">
             <button class="btn btn-outline btn-large" id="replay-note-btn">🔊 播放单音</button>
+            <div id="note-options" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;"></div>
             <div id="feedback-note"></div>
+            <div id="piano-octave-controls" style="display:flex;justify-content:center;align-items:center;gap:12px;margin:8px 0;">
+                <button class="btn btn-outline" id="octave-down-btn" style="padding:6px 16px;font-size:18px;min-width:44px;">◀</button>
+                <span id="octave-range-label" style="font-size:13px;color:var(--text-secondary);min-width:80px;text-align:center;">C3 - B4</span>
+                <button class="btn btn-outline" id="octave-up-btn" style="padding:6px 16px;font-size:18px;min-width:44px;">▶</button>
+            </div>
             <div id="piano-container"><div id="piano"></div></div>
         </div>
 
         <!-- 音程听辨区 -->
         <div id="interval-section" style="display:none;">
             <button class="btn btn-outline btn-large" id="replay-interval-btn">🔊 播放音程</button>
-            <div id="feedback-interval"></div>
             <div id="interval-options" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;"></div>
+            <div id="feedback-interval"></div>
         </div>
 
         <button class="btn btn-primary btn-large" id="next-btn" style="display:none;">下一题 →</button>
@@ -523,8 +671,8 @@ const CHORD_DEFS = {
     ],
 };
 
-const DIFF_NAMES = ['beginner', 'intermediate', 'advanced', 'pro'];
-const DIFF_LABELS = ['初级', '中级', '高级', '专业级'];
+const DIFF_NAMES = ['beginner', 'intermediate', 'advanced', 'pro', 'mixed'];
+const DIFF_LABELS = ['初级', '中级', '高级', '专业级', '混合'];
 
 // ==================== 音程定义 ====================
 const INTERVAL_DEFS = [
@@ -552,7 +700,9 @@ let settings = {
     waveType: 'triangle',
     volume: 0.7,
     pianoSize: 'medium',
+    pianoOctave: 3,      // 钢琴显示的起始八度（C3-C5）
     theme: 'auto',
+    showHints: true,
 };
 
 // ==================== 状态管理 ====================
@@ -568,15 +718,26 @@ let appState = {
     answered: false,          // 当前题目是否已作答
     totalCorrect: 0,
     totalAttempts: 0,
+    diffQuestions: {},        // 每个难度的缓存题目 { 0: q, 1: q, ... }
+    // 计时模式
+    timerActive: false,
+    timerRunning: false,
+    timerScore: 0,
+    energyBars: 0,
+    timerStartTime: null,
+    timerIntervalId: null,
 };
 
 // ==================== 统计 ====================
 let stats = {
-    beginner:   { correct:0, total:0 },
-    intermediate:{ correct:0, total:0 },
-    advanced:   { correct:0, total:0 },
-    pro:        { correct:0, total:0 },
+    beginner:     { correct:0, total:0, streak:0, bestStreak:0 },
+    intermediate: { correct:0, total:0, streak:0, bestStreak:0 },
+    advanced:     { correct:0, total:0, streak:0, bestStreak:0 },
+    pro:          { correct:0, total:0, streak:0, bestStreak:0 },
+    mixed:        { correct:0, total:0, streak:0, bestStreak:0 },
     bestStreak: 0,
+    timerBest: 0,
+    timerGames: 0,
 };
 
 // ==================== localStorage ====================
@@ -597,7 +758,17 @@ function loadData() {
             const data = JSON.parse(raw);
             appState.unlockedDiff = data.unlockedDiff ?? 0;
             appState.bestStreak = data.bestStreak ?? 0;
-            if (data.stats) stats = data.stats;
+            if (data.stats) {
+                stats = data.stats;
+                // 补齐旧数据可能缺失的字段
+                DIFF_NAMES.forEach(key => {
+                    if (!stats[key]) stats[key] = { correct:0, total:0, streak:0, bestStreak:0 };
+                    if (stats[key].streak === undefined) stats[key].streak = 0;
+                    if (stats[key].bestStreak === undefined) stats[key].bestStreak = 0;
+                });
+                if (stats.timerBest === undefined) stats.timerBest = 0;
+                if (stats.timerGames === undefined) stats.timerGames = 0;
+            }
             if (data.settings) {
                 settings = { ...settings, ...data.settings };
             }
@@ -642,12 +813,14 @@ function playNote(midi, duration = 1.0, startTime = 0) {
 }
 
 /**
- * 播放和弦（多个音同时发声）
+ * 播放和弦（多个音可调间隔发声）
  * @param {number[]} midiNotes - MIDI 音符号数组
- * @param {number} duration - 时长（秒）
+ * @param {number} duration - 每个音的时长（秒）
+ * @param {number} staggerMs - 音与音之间的延迟（毫秒），0=同时发声
  */
-function playChord(midiNotes, duration = 1.5) {
-    midiNotes.forEach(midi => playNote(midi, duration, 0));
+function playChord(midiNotes, duration = 1.5, staggerMs = 0) {
+    const staggerSec = staggerMs / 1000;
+    midiNotes.forEach((midi, i) => playNote(midi, duration, i * staggerSec));
 }
 
 /**
@@ -662,9 +835,14 @@ function playInterval(midi1, midi2, gap = 0.4) {
 }
 
 // ==================== 随机工具 ====================
-/** 生成随机 MIDI 音符号，范围 C3(48) - C5(72) */
+/** 生成随机 MIDI 音符号，范围 C1(24) - B5(83) */
 function randomMidi() {
-    return 48 + Math.floor(Math.random() * 25); // 48-72
+    return 24 + Math.floor(Math.random() * 60); // 24-83
+}
+
+/** 生成和弦根音 MIDI，范围 C3(48) - B4(71)，两个八度 */
+function randomChordRoot() {
+    return 48 + Math.floor(Math.random() * 24); // C3-B4
 }
 
 /** 从数组中随机取 n 个元素 */
@@ -681,6 +859,10 @@ function pickOne(arr) {
 // ==================== 题目生成 ====================
 /** 获取当前难度的和弦列表 */
 function getChordsForDiff(diff) {
+    if (diff === 4) {
+        // 混合模式：所有和弦
+        return [...CHORD_DEFS.beginner, ...CHORD_DEFS.intermediate, ...CHORD_DEFS.advanced, ...CHORD_DEFS.pro];
+    }
     const key = DIFF_NAMES[diff];
     return CHORD_DEFS[key] || [];
 }
@@ -688,54 +870,127 @@ function getChordsForDiff(diff) {
 /** 生成和弦听辨题目 */
 function generateChordQuestion() {
     const chords = getChordsForDiff(appState.currentDiff);
-    const correct = pickOne(chords);
-    const rootMidi = randomMidi();
-    const midiNotes = correct.intervals.map(i => rootMidi + i);
+    const isMixed = appState.currentDiff === 4;
 
-    // 从同难度中选 3 个干扰项
-    const others = chords.filter(c => c.id !== correct.id);
-    const distractors = pickRandom(others, Math.min(3, others.length));
-    const options = pickRandom([correct, ...distractors], 4);
+    const correctChord = pickOne(chords);
+    const rootMidi = randomChordRoot();
+    const midiNotes = correctChord.intervals.map(i => rootMidi + i);
+
+    // 同一八度内选根音
+    const octaveBase = Math.floor(rootMidi / 12) * 12;
+    const allNotesInOctave = [];
+    for (let i = 0; i < 12; i++) {
+        const midi = octaveBase + i;
+        if (midi >= 24 && midi <= 83) allNotesInOctave.push(midi);
+    }
+
+    let options;
+
+    if (isMixed) {
+        // 混合模式：4 个选项 = 4 种不同和弦类型 + 4 个不同根音
+        const otherChords = chords.filter(c => c.id !== correctChord.id);
+        const shuffledChords = pickRandom(otherChords, otherChords.length);
+
+        // 为每个干扰和弦选不同根音（排除已用根音）
+        const distractors = [];
+        const usedRoots = new Set([rootMidi]);
+
+        for (const chord of shuffledChords) {
+            if (distractors.length >= 3) break;
+            const availableRoots = allNotesInOctave.filter(m => !usedRoots.has(m) && Math.abs(m - rootMidi) >= 2);
+            if (availableRoots.length === 0) continue;
+            const r = pickOne(availableRoots);
+            usedRoots.add(r);
+            distractors.push({ chordDef: chord, rootMidi: r, rootNote: NOTE_NAMES[r % 12] });
+        }
+
+        // 如果不够 3 个，从同类型不同根音补
+        if (distractors.length < 3) {
+            const extraRoots = allNotesInOctave.filter(m => !usedRoots.has(m));
+            for (const r of pickRandom(extraRoots, extraRoots.length)) {
+                if (distractors.length >= 3) break;
+                if (usedRoots.has(r)) continue;
+                usedRoots.add(r);
+                distractors.push({ chordDef: correctChord, rootMidi: r, rootNote: NOTE_NAMES[r % 12] });
+            }
+        }
+
+        const buildOption = (rootMidi, chordDef) => ({
+            chordDef,
+            rootMidi,
+            rootNote: NOTE_NAMES[rootMidi % 12],
+            label: NOTE_NAMES[rootMidi % 12] + (chordDef.symbol || ''),
+        });
+
+        options = [
+            buildOption(rootMidi, correctChord),
+            ...distractors.map(d => buildOption(d.rootMidi, d.chordDef)),
+        ];
+    } else {
+        // 非混合模式：4 个选项 = 同一和弦类型，4 个不同根音
+        const otherNotes = allNotesInOctave.filter(m => m !== rootMidi);
+        const shuffled = pickRandom(otherNotes, otherNotes.length);
+        const good = shuffled.filter(m => Math.abs(m - rootMidi) >= 3);
+        const distRoots = (good.length >= 3 ? pickRandom(good, 3) : pickRandom(shuffled, 3)).slice(0, 3);
+
+        const buildOption = (midi) => ({
+            chordDef: correctChord,
+            rootMidi: midi,
+            rootNote: NOTE_NAMES[midi % 12],
+            label: NOTE_NAMES[midi % 12] + (correctChord.symbol || ''),
+        });
+
+        options = [buildOption(rootMidi), ...distRoots.map(m => buildOption(m))];
+    }
+
+    const correctOption = options[0]; // shuffle 前保存正确答案引用
+    const shuffledOptions = pickRandom(options, options.length);
 
     return {
         type: 'chord',
-        correct,
+        correct: correctOption,
+        chordDef: correctChord,
         rootMidi,
         midiNotes,
-        options, // 4 个选项
+        options: shuffledOptions,
     };
 }
 
 /** 生成单音听辨题目 */
 function generateNoteQuestion() {
-    const midi = randomMidi();
+    // 计时模式用 C2-B5 范围，无尽模式用 C1-B5
+    const minMidi = appState.timerActive ? 36 : 24;
+    const maxMidi = appState.timerActive ? 83 : 83;
+    const midi = minMidi + Math.floor(Math.random() * (maxMidi - minMidi + 1));
     const noteName = NOTE_NAMES[midi % 12];
     const octave = Math.floor(midi / 12) - 1;
     const fullName = noteName + octave;
 
-    return {
+    const question = {
         type: 'note',
         midi,
         noteName: fullName,
     };
+
+    // 计时模式：生成 4 个选项
+    if (appState.timerActive) {
+        const allNotes = [];
+        for (let m = minMidi; m <= maxMidi; m++) {
+            const n = NOTE_NAMES[m % 12];
+            const o = Math.floor(m / 12) - 1;
+            allNotes.push({ midi: m, name: n + o });
+        }
+        const others = allNotes.filter(n => n.midi !== midi);
+        const distractors = pickRandom(others, 3);
+        question.options = pickRandom([{ midi, name: fullName }, ...distractors], 4);
+    }
+
+    return question;
 }
 
 /** 生成音程听辨题目 */
 function generateIntervalQuestion() {
-    // 根据难度给不同的音程范围
-    let availableIntervals;
-    switch (appState.currentDiff) {
-        case 0: // 初级：纯四度、纯五度、纯八度、大小三度
-            availableIntervals = INTERVAL_DEFS.filter(d => ['p4','p5','p8','min3','maj3'].includes(d.id));
-            break;
-        case 1: // 中级：+ 大小二度、大小六度
-            availableIntervals = INTERVAL_DEFS.filter(d => !['min7','maj7','tt'].includes(d.id));
-            break;
-        default: // 高级+：全部
-            availableIntervals = [...INTERVAL_DEFS];
-            break;
-    }
-
+    const availableIntervals = [...INTERVAL_DEFS];
     const correct = pickOne(availableIntervals);
     const baseMidi = 55 + Math.floor(Math.random() * 12); // G3-F#4
     const topMidi = baseMidi + correct.semitones;
@@ -763,7 +1018,9 @@ function renderDifficultyButtons() {
         const diff = parseInt(btn.dataset.diff);
         btn.classList.remove('active', 'locked');
         btn.textContent = DIFF_LABELS[diff];
-        if (diff > appState.unlockedDiff) {
+        // 混合(4)：专业级解锁后才开放；其他：超过unlockedDiff则锁定
+        const locked = (diff === 4) ? (appState.unlockedDiff < 3) : (diff > appState.unlockedDiff);
+        if (locked) {
             btn.classList.add('locked');
             btn.textContent = DIFF_LABELS[diff] + ' 🔒';
         }
@@ -773,31 +1030,27 @@ function renderDifficultyButtons() {
     });
 }
 
-/** 渲染钢琴键盘（两个八度，C3-C5） */
+/** 渲染钢琴键盘（两个八度，可切换起始八度） */
 function renderPiano() {
     const piano = document.getElementById('piano');
     piano.className = 'size-' + settings.pianoSize;
     piano.innerHTML = '';
 
-    const startOctave = 3, endOctave = 5;
     const whiteKeyW = settings.pianoSize === 'small' ? 28 : settings.pianoSize === 'large' ? 44 : 36;
+    const blackKeyW = whiteKeyW * 0.6;
+    const baseOctave = settings.pianoOctave;
+    const midiMin = 24, midiMax = 83; // C1-B5
 
-    // 黑键在每个八度内的半音位置，以及相对前一个白键的偏移比例
-    const blackDefs = [
-        { midiOffset: 1,  afterWhite: 0, ratio: 0.65 },  // C#
-        { midiOffset: 3,  afterWhite: 1, ratio: 0.75 },  // D#
-        { midiOffset: 6,  afterWhite: 3, ratio: 0.70 },  // F#
-        { midiOffset: 8,  afterWhite: 4, ratio: 0.70 },  // G#
-        { midiOffset: 10, afterWhite: 5, ratio: 0.70 },  // A#
-    ];
-
-    // 收集所有白键
+    // 收集两个八度内的白键
     const whiteKeys = [];
-    for (let o = startOctave; o <= endOctave; o++) {
+    const midiToWhiteIdx = {};
+    for (let o = baseOctave; o <= baseOctave + 1; o++) {
         for (const wi of WHITE_KEY_INDICES) {
-            const midi = o * 12 + wi;
-            if (midi >= 48 && midi <= 72) {
-                whiteKeys.push({ midi, note: NOTE_NAMES[wi], octave: o });
+            const midi = 12 * (o + 1) + wi;
+            if (midi >= midiMin && midi <= midiMax) {
+                midiToWhiteIdx[midi] = whiteKeys.length;
+                const octaveNum = Math.floor(midi / 12) - 1;
+                whiteKeys.push({ midi, note: NOTE_NAMES[wi], label: NOTE_NAMES[wi] + octaveNum });
             }
         }
     }
@@ -809,38 +1062,65 @@ function renderPiano() {
         el.style.width = whiteKeyW + 'px';
         el.style.minWidth = whiteKeyW + 'px';
         el.dataset.midi = k.midi;
-        el.textContent = k.note;
+        el.textContent = k.label;
         el.addEventListener('click', () => onPianoKeyClick(k.midi));
         piano.appendChild(el);
     });
 
-    // 渲染黑键（绝对定位）
-    // 先计算每个白键在累计宽度中的位置
-    const whitePositions = {};
-    whiteKeys.forEach((k, idx) => { whitePositions[k.midi] = idx; });
+    const blackDefs = [
+        { midiOffset: 1,  between: [0, 2] },
+        { midiOffset: 3,  between: [2, 4] },
+        { midiOffset: 6,  between: [5, 7] },
+        { midiOffset: 8,  between: [7, 9] },
+        { midiOffset: 10, between: [9, 11] },
+    ];
 
-    for (let o = startOctave; o <= endOctave; o++) {
+    // 渲染黑键
+    for (let o = baseOctave; o <= baseOctave + 1; o++) {
         for (const bd of blackDefs) {
-            const midi = o * 12 + bd.midiOffset;
-            if (midi < 48 || midi > 72) continue;
+            const midi = 12 * (o + 1) + bd.midiOffset;
+            if (midi < midiMin || midi > midiMax) continue;
 
-            // 找到该八度内白键的起始 index
-            const firstWhiteMidi = o * 12 + WHITE_KEY_INDICES[0]; // C
-            const baseWhiteIdx = whitePositions[firstWhiteMidi];
-            if (baseWhiteIdx === undefined) continue;
+            const leftMidi = 12 * (o + 1) + bd.between[0];
+            const rightMidi = 12 * (o + 1) + bd.between[1];
+            const leftIdx = midiToWhiteIdx[leftMidi];
+            const rightIdx = midiToWhiteIdx[rightMidi];
+            if (leftIdx === undefined || rightIdx === undefined) continue;
 
-            const targetWhiteIdx = baseWhiteIdx + bd.afterWhite;
-            const left = (targetWhiteIdx + bd.ratio) * whiteKeyW - 12; // 12 = 黑键宽度的一半
+            const centerLeft = (leftIdx + 0.5) * whiteKeyW;
+            const centerRight = (rightIdx + 0.5) * whiteKeyW;
+            const blackCenter = (centerLeft + centerRight) / 2;
+            const left = blackCenter - blackKeyW / 2;
 
             const el = document.createElement('div');
             el.className = 'black-key';
             el.dataset.midi = midi;
             el.style.left = left + 'px';
-            el.style.width = (whiteKeyW * 0.66) + 'px';
+            el.style.width = blackKeyW + 'px';
+            el.style.height = '58%';
             el.addEventListener('click', (e) => { e.stopPropagation(); onPianoKeyClick(midi); });
             piano.appendChild(el);
         }
     }
+}
+
+/** 更新八度范围标签 */
+function updateOctaveLabel() {
+    const baseOctave = settings.pianoOctave;
+    const startNote = 'C' + baseOctave;
+    const endMidi = Math.min(12 * (baseOctave + 3) - 1, 83);
+    const endOctave = Math.floor(endMidi / 12) - 1;
+    const endNote = NOTE_NAMES[endMidi % 12] + endOctave;
+    document.getElementById('octave-range-label').textContent = startNote + ' - ' + endNote;
+}
+
+/** 格式化和弦选项文字 */
+function formatChordLabel(opt) {
+    const en = opt.rootNote + opt.chordDef.symbol;
+    if (settings.showHints) {
+        return en + '（' + opt.chordDef.name + '）';
+    }
+    return en;
 }
 
 /** 渲染和弦选项 */
@@ -850,7 +1130,7 @@ function renderChordOptions(question) {
     question.options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'btn-option';
-        btn.textContent = opt.name + ' ' + opt.symbol;
+        btn.textContent = formatChordLabel(opt);
         btn.addEventListener('click', () => onChordAnswer(opt, question));
         container.appendChild(btn);
     });
@@ -869,56 +1149,151 @@ function renderIntervalOptions(question) {
     });
 }
 
+/** 渲染单音选项（计时模式） */
+function renderNoteOptions(question) {
+    const container = document.getElementById('note-options');
+    container.innerHTML = '';
+    if (!question.options) return;
+    question.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.textContent = opt.name;
+        btn.addEventListener('click', () => onNoteOptionClick(opt, question));
+        container.appendChild(btn);
+    });
+}
+
+function onNoteOptionClick(chosen, question) {
+    if (appState.answered) return;
+    appState.answered = true;
+
+    const correct = chosen.midi === question.midi;
+    const feedback = document.getElementById('feedback-note');
+    document.querySelectorAll('#note-options .btn-option').forEach(b => { b.disabled = true; });
+
+    if (correct) {
+        appState.timerScore++;
+        appState.energyBars++;
+        document.getElementById('timer-score-val').textContent = appState.timerScore;
+        feedback.textContent = '✅ 正确';
+        feedback.className = 'correct';
+        document.querySelectorAll('#note-options .btn-option').forEach(b => {
+            if (b.textContent === question.noteName) b.classList.add('correct');
+        });
+        updateEnergyBarsUI();
+        if (appState.energyBars >= 3) {
+            addTime(5);
+            appState.energyBars = 0;
+            updateEnergyBarsUI();
+        }
+    } else {
+        appState.energyBars = 0;
+        flashEnergyBars();
+        setTimeout(() => updateEnergyBarsUI(), 350);
+        feedback.textContent = '❌ 错误！' + question.noteName;
+        feedback.className = 'wrong';
+        document.querySelectorAll('#note-options .btn-option').forEach(b => {
+            if (b.textContent === question.noteName) b.classList.add('correct');
+            if (b.textContent === chosen.name) b.classList.add('wrong');
+        });
+    }
+    setTimeout(() => { nextQuestionForTimer(); }, 500);
+}
+
 /** 更新分数显示 */
 function updateScoreDisplay() {
-    document.getElementById('score-val').textContent = appState.score;
-    document.getElementById('streak-val').textContent = appState.streak;
-    const rate = appState.totalAttempts > 0
-        ? Math.round((appState.totalCorrect / appState.totalAttempts) * 100) + '%'
-        : '-';
+    const diffKey = DIFF_NAMES[appState.currentDiff];
+    const s = stats[diffKey];
+    document.getElementById('streak-val').textContent = s.streak;
+    const rate = s.total > 0 ? Math.round((s.correct / s.total) * 100) + '%' : '-';
     document.getElementById('rate-val').textContent = rate;
 }
 
 // ==================== 答题处理 ====================
 function onChordAnswer(chosen, question) {
     if (appState.answered) return;
+
+    // 计时模式分支
+    if (appState.timerActive && appState.timerRunning) {
+        appState.answered = true;
+        const correct = chosen.rootMidi === question.correct.rootMidi && chosen.chordDef.id === question.correct.chordDef.id;
+        const feedback = document.getElementById('feedback');
+        document.querySelectorAll('#chord-options .btn-option').forEach(b => { b.disabled = true; });
+
+        if (correct) {
+            appState.timerScore++;
+            appState.energyBars++;
+            document.getElementById('timer-score-val').textContent = appState.timerScore;
+            feedback.textContent = '✅ 正确';
+            feedback.className = 'correct';
+            document.querySelectorAll('#chord-options .btn-option').forEach(b => {
+                if (b.textContent === formatChordLabel(chosen)) b.classList.add('correct');
+            });
+            if (appState.energyBars >= 3) {
+                appState.energyBars = 0;
+                updateEnergyBarsUI();
+                addTime(5);
+            } else {
+                updateEnergyBarsUI();
+            }
+        } else {
+            appState.energyBars = 0;
+            flashEnergyBars();
+            setTimeout(() => updateEnergyBarsUI(), 350);
+            feedback.textContent = '❌ 错误！' + formatChordLabel(question.correct);
+            feedback.className = 'wrong';
+            document.querySelectorAll('#chord-options .btn-option').forEach(b => {
+                if (b.textContent === formatChordLabel(question.correct)) b.classList.add('correct');
+                if (b.textContent === formatChordLabel(chosen)) b.classList.add('wrong');
+            });
+        }
+        setTimeout(() => { nextQuestionForTimer(); }, 500);
+        return;
+    }
+
+    // 无尽模式
     appState.answered = true;
     appState.totalAttempts++;
 
-    const correct = chosen.id === question.correct.id;
     const feedback = document.getElementById('feedback');
+    try {
+        const correct = chosen.rootMidi === question.correct.rootMidi && chosen.chordDef.id === question.correct.chordDef.id;
+        const correctLabel = formatChordLabel(question.correct);
 
-    if (correct) {
-        appState.score += 10;
-        appState.streak++;
-        appState.totalCorrect++;
-        if (appState.streak > appState.bestStreak) {
-            appState.bestStreak = appState.streak;
+        if (correct) {
+            appState.streak++;
+            appState.totalCorrect++;
+            if (appState.streak > appState.bestStreak) {
+                appState.bestStreak = appState.streak;
+            }
+            feedback.textContent = '✅ 正确！' + correctLabel;
+            feedback.className = 'correct';
+            document.querySelectorAll('#chord-options .btn-option').forEach(b => {
+                if (b.textContent === correctLabel) b.classList.add('correct');
+                b.disabled = true;
+            });
+            const diffKey = DIFF_NAMES[appState.currentDiff];
+            stats[diffKey].correct++;
+            stats[diffKey].total++;
+            stats[diffKey].streak++;
+            if (stats[diffKey].streak > stats[diffKey].bestStreak) stats[diffKey].bestStreak = stats[diffKey].streak;
+            tryUnlockNextDifficulty();
+        } else {
+            appState.streak = 0;
+            feedback.textContent = '❌ 错误！正确答案：' + correctLabel;
+            feedback.className = 'wrong';
+            document.querySelectorAll('#chord-options .btn-option').forEach(b => {
+                if (b.textContent === correctLabel) b.classList.add('correct');
+                if (b.textContent === formatChordLabel(chosen)) b.classList.add('wrong');
+                b.disabled = true;
+            });
+            const diffKey = DIFF_NAMES[appState.currentDiff];
+            stats[diffKey].total++;
+            stats[diffKey].streak = 0;
         }
-        feedback.textContent = '✅ 正确！' + question.correct.name;
-        feedback.className = 'correct';
-        // 标记选项颜色
-        document.querySelectorAll('#chord-options .btn-option').forEach(b => {
-            if (b.textContent.includes(question.correct.name)) b.classList.add('correct');
-            b.disabled = true;
-        });
-        // 记录统计
-        const diffKey = DIFF_NAMES[appState.currentDiff];
-        stats[diffKey].correct++;
-        stats[diffKey].total++;
-        // 解锁下一难度
-        tryUnlockNextDifficulty();
-    } else {
-        appState.streak = 0;
-        feedback.textContent = '❌ 错误！正确答案：' + question.correct.name;
+    } catch (e) {
+        feedback.textContent = '⚠️ 出错了：' + e.message;
         feedback.className = 'wrong';
-        document.querySelectorAll('#chord-options .btn-option').forEach(b => {
-            if (b.textContent.includes(question.correct.name)) b.classList.add('correct');
-            if (b.textContent.includes(chosen.name) && chosen.id !== question.correct.id) b.classList.add('wrong');
-            b.disabled = true;
-        });
-        const diffKey = DIFF_NAMES[appState.currentDiff];
-        stats[diffKey].total++;
     }
 
     updateScoreDisplay();
@@ -928,6 +1303,43 @@ function onChordAnswer(chosen, question) {
 
 function onPianoKeyClick(midi) {
     if (appState.answered) return;
+
+    // 计时模式分支
+    if (appState.timerActive && appState.timerRunning) {
+        appState.answered = true;
+        const question = appState.currentQuestion;
+        const correct = midi === question.midi;
+        const feedback = document.getElementById('feedback-note');
+
+        document.querySelectorAll('#piano [data-midi]').forEach(el => {
+            if (parseInt(el.dataset.midi) === question.midi) el.classList.add('highlight');
+        });
+
+        if (correct) {
+            appState.timerScore++;
+            appState.energyBars++;
+            document.getElementById('timer-score-val').textContent = appState.timerScore;
+            feedback.textContent = '✅ 正确';
+            feedback.className = 'correct';
+            if (appState.energyBars >= 3) {
+                appState.energyBars = 0;
+                updateEnergyBarsUI();
+                addTime(5);
+            } else {
+                updateEnergyBarsUI();
+            }
+        } else {
+            appState.energyBars = 0;
+            flashEnergyBars();
+            setTimeout(() => updateEnergyBarsUI(), 350);
+            feedback.textContent = '❌ 错误！' + question.noteName;
+            feedback.className = 'wrong';
+        }
+        setTimeout(() => { nextQuestionForTimer(); }, 500);
+        return;
+    }
+
+    // 无尽模式
     appState.answered = true;
     appState.totalAttempts++;
 
@@ -936,7 +1348,6 @@ function onPianoKeyClick(midi) {
     const feedback = document.getElementById('feedback-note');
 
     if (correct) {
-        appState.score += 10;
         appState.streak++;
         appState.totalCorrect++;
         if (appState.streak > appState.bestStreak) appState.bestStreak = appState.streak;
@@ -945,6 +1356,8 @@ function onPianoKeyClick(midi) {
         const diffKey = DIFF_NAMES[appState.currentDiff];
         stats[diffKey].correct++;
         stats[diffKey].total++;
+        stats[diffKey].streak++;
+        if (stats[diffKey].streak > stats[diffKey].bestStreak) stats[diffKey].bestStreak = stats[diffKey].streak;
         tryUnlockNextDifficulty();
     } else {
         appState.streak = 0;
@@ -952,9 +1365,9 @@ function onPianoKeyClick(midi) {
         feedback.className = 'wrong';
         const diffKey = DIFF_NAMES[appState.currentDiff];
         stats[diffKey].total++;
+        stats[diffKey].streak = 0;
     }
 
-    // 高亮正确琴键
     document.querySelectorAll('#piano [data-midi]').forEach(el => {
         if (parseInt(el.dataset.midi) === question.midi) el.classList.add('highlight');
     });
@@ -966,6 +1379,46 @@ function onPianoKeyClick(midi) {
 
 function onIntervalAnswer(chosen, question) {
     if (appState.answered) return;
+
+    // 计时模式分支
+    if (appState.timerActive && appState.timerRunning) {
+        appState.answered = true;
+        const correct = chosen.id === question.correct.id;
+        const feedback = document.getElementById('feedback-interval');
+        document.querySelectorAll('#interval-options .btn-option').forEach(b => { b.disabled = true; });
+
+        if (correct) {
+            appState.timerScore++;
+            appState.energyBars++;
+            document.getElementById('timer-score-val').textContent = appState.timerScore;
+            feedback.textContent = '✅ 正确';
+            feedback.className = 'correct';
+            document.querySelectorAll('#interval-options .btn-option').forEach(b => {
+                if (b.textContent === question.correct.name) b.classList.add('correct');
+            });
+            if (appState.energyBars >= 3) {
+                appState.energyBars = 0;
+                updateEnergyBarsUI();
+                addTime(5);
+            } else {
+                updateEnergyBarsUI();
+            }
+        } else {
+            appState.energyBars = 0;
+            flashEnergyBars();
+            setTimeout(() => updateEnergyBarsUI(), 350);
+            feedback.textContent = '❌ 错误！' + question.correct.name;
+            feedback.className = 'wrong';
+            document.querySelectorAll('#interval-options .btn-option').forEach(b => {
+                if (b.textContent === question.correct.name) b.classList.add('correct');
+                if (b.textContent === chosen.name) b.classList.add('wrong');
+            });
+        }
+        setTimeout(() => { nextQuestionForTimer(); }, 500);
+        return;
+    }
+
+    // 无尽模式
     appState.answered = true;
     appState.totalAttempts++;
 
@@ -973,7 +1426,6 @@ function onIntervalAnswer(chosen, question) {
     const feedback = document.getElementById('feedback-interval');
 
     if (correct) {
-        appState.score += 10;
         appState.streak++;
         appState.totalCorrect++;
         if (appState.streak > appState.bestStreak) appState.bestStreak = appState.streak;
@@ -982,6 +1434,8 @@ function onIntervalAnswer(chosen, question) {
         const diffKey = DIFF_NAMES[appState.currentDiff];
         stats[diffKey].correct++;
         stats[diffKey].total++;
+        stats[diffKey].streak++;
+        if (stats[diffKey].streak > stats[diffKey].bestStreak) stats[diffKey].bestStreak = stats[diffKey].streak;
         tryUnlockNextDifficulty();
     } else {
         appState.streak = 0;
@@ -989,6 +1443,7 @@ function onIntervalAnswer(chosen, question) {
         feedback.className = 'wrong';
         const diffKey = DIFF_NAMES[appState.currentDiff];
         stats[diffKey].total++;
+        stats[diffKey].streak = 0;
     }
 
     document.querySelectorAll('#interval-options .btn-option').forEach(b => {
@@ -1004,11 +1459,11 @@ function onIntervalAnswer(chosen, question) {
 
 /** 尝试解锁下一难度 */
 function tryUnlockNextDifficulty() {
-    const diffKey = DIFF_NAMES[appState.currentDiff];
-    const diffStats = stats[diffKey];
-    // 当前难度累计答对 5 题，解锁下一级
-    if (diffStats.correct >= 5 && appState.unlockedDiff < 3 && appState.currentDiff === appState.unlockedDiff) {
+    if (appState.currentMode !== 'chord') return;
+    if (appState.currentDiff === 4) return; // 混合模式不参与解锁
+    if (appState.streak >= 10 && appState.currentDiff === appState.unlockedDiff && appState.unlockedDiff < 3) {
         appState.unlockedDiff = Math.min(appState.unlockedDiff + 1, 3);
+        appState.streak = 0; // 解锁后重置连续计数
         showToast('🔓 已解锁 ' + DIFF_LABELS[appState.unlockedDiff] + ' 难度！');
         renderDifficultyButtons();
     }
@@ -1027,7 +1482,13 @@ function nextQuestion() {
     document.getElementById('feedback-interval').className = '';
     document.querySelectorAll('#piano [data-midi]').forEach(el => el.classList.remove('highlight'));
 
+    // 清除当前难度的缓存题目
+    delete appState.diffQuestions[appState.currentDiff];
+
     loadQuestion();
+
+    // 缓存新题目
+    appState.diffQuestions[appState.currentDiff] = appState.currentQuestion;
 
     // 自动播放（用户点击"下一题"是用户手势，允许播放）
     autoPlayCurrentQuestion();
@@ -1038,7 +1499,11 @@ function autoPlayCurrentQuestion() {
     const q = appState.currentQuestion;
     if (!q) return;
     switch (q.type) {
-        case 'chord': playChord(q.midiNotes); break;
+        case 'chord': {
+            const stagger = parseInt(document.getElementById('arpeggio-slider').value) || 0;
+            playChord(q.midiNotes, 1.5, stagger);
+            break;
+        }
         case 'note': playNote(q.midi); break;
         case 'interval': playInterval(q.baseMidi, q.topMidi); break;
     }
@@ -1061,6 +1526,7 @@ function loadChordQuestion() {
 function loadNoteQuestion() {
     const q = generateNoteQuestion();
     appState.currentQuestion = q;
+    if (appState.timerActive) renderNoteOptions(q);
 }
 
 function loadIntervalQuestion() {
@@ -1071,8 +1537,11 @@ function loadIntervalQuestion() {
 
 // ==================== 模式切换 ====================
 function switchMode(mode) {
+    if (appState.timerRunning) return;
+    if (!mode) return;
+    if (mode !== appState.currentMode) appState.diffQuestions = {}; // 切模式才清缓存
     appState.currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#mode-selector .mode-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
 
     document.getElementById('chord-section').style.display = mode === 'chord' ? '' : 'none';
@@ -1088,18 +1557,79 @@ function switchMode(mode) {
     document.getElementById('next-btn').style.display = 'none';
     appState.answered = false;
 
+    // 计时模式下重新定位计时元素到当前 section，更新播放按钮文字
+    if (appState.timerActive) {
+        const section = document.getElementById(mode + '-section');
+        const rb = document.getElementById(mode === 'chord' ? 'replay-btn' : 'replay-' + mode + '-btn');
+        const timerEls = document.getElementById('timer-elements');
+        const resultEl = document.getElementById('timer-result');
+        if (rb) {
+            section.insertBefore(timerEls, rb);
+            section.insertBefore(resultEl, rb);
+        }
+        const replayBtns = ['replay-btn', 'replay-note-btn', 'replay-interval-btn'];
+        replayBtns.forEach(id => {
+            const b = document.getElementById(id);
+            if (b) b.textContent = '开始挑战';
+        });
+        // 隐藏钢琴（note 模式）
+        const piano = document.getElementById('piano-container');
+        const octaveCtrls = document.getElementById('piano-octave-controls');
+        if (piano) piano.style.display = 'none';
+        if (octaveCtrls) octaveCtrls.style.display = 'none';
+    }
+
+    // 非和弦模式固定初级难度（音程用难度区分范围，单音不分难度）
+    if (mode !== 'chord') {
+        appState.currentDiff = 0;
+    }
+
     loadQuestion();
+
+    // 计时模式下隐藏选项（等点击开始挑战后才显示）
+    if (appState.timerActive) {
+        document.getElementById('chord-options').innerHTML = '';
+        document.getElementById('interval-options').innerHTML = '';
+        document.getElementById('note-options').innerHTML = '';
+    }
+
+    // 更新难度按钮选中状态
+    if (mode === 'chord') renderDifficultyButtons();
 }
 
 // ==================== 难度切换 ====================
 function switchDifficulty(diff) {
-    if (diff > appState.unlockedDiff) {
-        showToast('🔒 请先完成当前难度（累计答对 5 题）');
+    if (appState.timerRunning) return;
+    if (diff === appState.currentDiff) return;
+    const locked = (diff === 4) ? (appState.unlockedDiff < 3) : (diff > appState.unlockedDiff);
+    if (locked) {
+        showToast('🔒 请先解锁当前难度（连续答对 10 题）');
         return;
+    }
+    // 保存当前难度的题目
+    if (appState.currentQuestion) {
+        appState.diffQuestions[appState.currentDiff] = appState.currentQuestion;
     }
     appState.currentDiff = diff;
     renderDifficultyButtons();
-    switchMode(appState.currentMode); // 重新加载题目
+    updateScoreDisplay();
+    // 恢复目标难度的缓存题目，没有则生成新的
+    if (appState.diffQuestions[diff]) {
+        appState.currentQuestion = appState.diffQuestions[diff];
+        appState.answered = false;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('feedback-note').textContent = '';
+        document.getElementById('feedback-interval').textContent = '';
+        document.getElementById('next-btn').style.display = 'none';
+        if (!appState.timerActive) {
+            if (appState.currentQuestion.type === 'chord') renderChordOptions(appState.currentQuestion);
+            else if (appState.currentQuestion.type === 'interval') renderIntervalOptions(appState.currentQuestion);
+        }
+        document.querySelectorAll('#piano [data-midi]').forEach(el => el.classList.remove('highlight'));
+    } else {
+        switchMode(appState.currentMode);
+        appState.diffQuestions[diff] = appState.currentQuestion;
+    }
 }
 
 // ==================== 页面导航 ====================
@@ -1149,13 +1679,32 @@ function renderStatsPage() {
     DIFF_NAMES.forEach((key, i) => {
         const s = stats[key];
         const rate = s.total > 0 ? Math.round((s.correct / s.total) * 100) + '%' : '-';
-        const unlocked = i <= appState.unlockedDiff;
-        detailHtml += '<div class="stat-row">' +
-            '<span>' + (unlocked ? '' : '🔒 ') + DIFF_LABELS[i] + '</span>' +
-            '<span class="stat-value">' + s.correct + '/' + s.total + ' (' + rate + ')</span>' +
+        const locked = (i === 4) ? (appState.unlockedDiff < 3) : (i > appState.unlockedDiff);
+        detailHtml += '<div class="stat-row" style="align-items:center;">' +
+            '<span>' + (locked ? '🔒 ' : '') + DIFF_LABELS[i] + '</span>' +
+            '<span class="stat-value" style="flex:1;margin:0 8px;">' + s.correct + '/' + s.total + ' (' + rate + ') | 最佳连续: ' + s.bestStreak + '</span>' +
+            '<span style="display:inline-block;padding:4px 10px;font-size:12px;color:#ff3b30;border:1px solid #ff3b30;border-radius:6px;cursor:pointer;white-space:nowrap;" data-reset-diff="' + i + '">重置</span>' +
             '</div>';
     });
+    // 计时模式统计
+    detailHtml += '<div class="section-title" style="margin-top:20px;">计时模式</div>';
+    detailHtml += '<div class="card">' +
+        '<div class="stat-row"><span>最佳成绩</span><span class="stat-value">' + stats.timerBest + ' 题</span></div>' +
+        '<div class="stat-row"><span>总局数</span><span class="stat-value">' + stats.timerGames + '</span></div>' +
+        '</div>';
+
     document.getElementById('stats-detail').innerHTML = detailHtml;
+}
+
+/** 重置指定难度统计 */
+function resetDiffStats(diffIdx) {
+    const key = DIFF_NAMES[diffIdx];
+    if (confirm('确定要重置「' + DIFF_LABELS[diffIdx] + '」的正确率数据吗？')) {
+        stats[key] = { correct:0, total:0, streak:0, bestStreak:0 };
+        saveData();
+        updateScoreDisplay();
+        renderStatsPage();
+    }
 }
 
 // ==================== 学习页面渲染 ====================
@@ -1314,6 +1863,255 @@ function renderChordFunctionsSection() {
     document.getElementById('learn-functions').innerHTML = html;
 }
 
+// ==================== 计时模式 ====================
+function toggleTimerMode(activate) {
+    if (activate === appState.timerActive) return;
+    appState.timerActive = activate;
+    const html = document.documentElement;
+    const btns = document.querySelectorAll('#timer-mode-selector .mode-btn');
+
+    if (appState.timerActive) {
+        html.setAttribute('data-timer', '');
+        btns.forEach(b => b.classList.remove('active'));
+        document.querySelector('#timer-mode-selector [data-timer="true"]').classList.add('active');
+    } else {
+        html.removeAttribute('data-timer');
+        btns.forEach(b => b.classList.remove('active'));
+        document.querySelector('#timer-mode-selector [data-timer="false"]').classList.add('active');
+    }
+
+    stopTimer();
+    updateTimerUI();
+}
+
+function updateTimerUI() {
+    const timerEls = document.getElementById('timer-elements');
+    const resultEl = document.getElementById('timer-result');
+    const scoreDisp = document.getElementById('score-display');
+    const arpeggioRow = document.getElementById('arpeggio-slider').parentElement;
+    const hintToggle = document.getElementById('hint-toggle').parentElement;
+    const nextBtn = document.getElementById('next-btn');
+    const chordOpts = document.getElementById('chord-options');
+    const intervalOpts = document.getElementById('interval-options');
+    const piano = document.getElementById('piano-container');
+    const octaveCtrls = document.getElementById('piano-octave-controls');
+    const replayBtns = [document.getElementById('replay-btn'), document.getElementById('replay-note-btn'), document.getElementById('replay-interval-btn')];
+    const feedbacks = [document.getElementById('feedback'), document.getElementById('feedback-note'), document.getElementById('feedback-interval')];
+
+    const replayLabels = { chord: '🔊 播放和弦', note: '🔊 播放单音', interval: '🔊 播放音程' };
+
+    if (appState.timerActive) {
+        // 将计时元素移到当前模式 section 内，难度选择下方
+        const section = document.getElementById(appState.currentMode + '-section');
+        const rb = document.getElementById(appState.currentMode === 'chord' ? 'replay-btn' : 'replay-' + appState.currentMode + '-btn');
+        if (rb) {
+            section.insertBefore(timerEls, rb);
+            section.insertBefore(resultEl, rb);
+        }
+
+        timerEls.style.display = '';
+        resultEl.style.display = 'none';
+        scoreDisp.style.display = 'none';
+        arpeggioRow.style.display = 'none';
+        hintToggle.style.display = 'none';
+        nextBtn.style.display = 'none';
+        chordOpts.innerHTML = '';
+        intervalOpts.innerHTML = '';
+        document.getElementById('note-options').innerHTML = '';
+        if (piano) piano.style.display = 'none';
+        if (octaveCtrls) octaveCtrls.style.display = 'none';
+        replayBtns.forEach(b => { if (b) { b.style.display = ''; b.textContent = '开始挑战'; } });
+        feedbacks.forEach(f => { if (f) { f.textContent = ''; f.className = ''; } });
+        document.querySelectorAll('#piano [data-midi]').forEach(el => el.classList.remove('highlight'));
+        appState.answered = false;
+        appState.currentQuestion = null;
+        document.getElementById('timer-countdown').textContent = '30.00';
+        document.getElementById('timer-countdown').classList.remove('warning');
+        document.getElementById('timer-score-val').textContent = '0';
+        updateEnergyBarsUI();
+    } else {
+        // 把计时元素移回 #practice-area
+        const practiceArea = document.getElementById('practice-area');
+        const scoreDispEl = document.getElementById('score-display');
+        if (scoreDispEl.nextSibling !== timerEls) {
+            practiceArea.insertBefore(timerEls, scoreDispEl.nextSibling);
+            practiceArea.insertBefore(resultEl, timerEls.nextSibling);
+        }
+
+        // 恢复模式切换按钮
+        document.querySelectorAll('#mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+        document.querySelectorAll('#timer-mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+
+        timerEls.style.display = 'none';
+        resultEl.style.display = 'none';
+        scoreDisp.style.display = '';
+        arpeggioRow.style.display = '';
+        hintToggle.style.display = '';
+        if (piano) piano.style.display = '';
+        if (octaveCtrls) octaveCtrls.style.display = '';
+        replayBtns.forEach(b => { if (b) { b.style.display = ''; b.textContent = replayLabels[appState.currentMode] || '🔊 播放'; } });
+        switchMode(appState.currentMode);
+    }
+}
+
+function startTimer() {
+    appState.timerRunning = true;
+    appState.timerScore = 0;
+    appState.energyBars = 0;
+    appState.answered = false;
+
+    document.getElementById('timer-result').style.display = 'none';
+    document.getElementById('timer-score-val').textContent = '0';
+    document.getElementById('timer-countdown').classList.remove('warning');
+    updateEnergyBarsUI();
+
+    // 禁用模式切换
+    document.querySelectorAll('#mode-selector .mode-btn').forEach(b => { b.disabled = true; });
+    document.querySelectorAll('#timer-mode-selector .mode-btn').forEach(b => { b.disabled = true; });
+
+    // 3-2-1 倒计时期间隐藏播放按钮
+    const replayLabels = { chord: '🔊 播放和弦', note: '🔊 播放单音', interval: '🔊 播放音程' };
+    const replayBtns = [document.getElementById('replay-btn'), document.getElementById('replay-note-btn'), document.getElementById('replay-interval-btn')];
+    replayBtns.forEach(b => { if (b) { b.style.display = 'none'; } });
+
+    // 计时模式下 note 模式隐藏钢琴，改用选项按钮
+    document.getElementById('piano-container').style.display = 'none';
+    document.getElementById('piano-octave-controls').style.display = 'none';
+
+    // 3-2-1 倒计时
+    const cd = document.getElementById('timer-countdown');
+    cd.textContent = '3';
+    let count = 3;
+    const countInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            cd.textContent = count;
+        } else {
+            clearInterval(countInterval);
+            cd.textContent = '30.00';
+            appState.timerStartTime = Date.now();
+            loadQuestion();
+            appState.diffQuestions[appState.currentDiff] = appState.currentQuestion;
+            autoPlayCurrentQuestion();
+            // 显示播放按钮
+            replayBtns.forEach(b => { if (b) { b.style.display = ''; b.textContent = replayLabels[appState.currentMode] || '🔊 播放'; } });
+            appState.timerIntervalId = setInterval(updateCountdown, 10);
+        }
+    }, 1000);
+}
+
+function updateCountdown() {
+    const elapsed = (Date.now() - appState.timerStartTime) / 1000;
+    const remaining = Math.max(0, 30 - elapsed);
+    const cd = document.getElementById('timer-countdown');
+    cd.textContent = remaining.toFixed(2);
+
+    if (remaining <= 5 && remaining > 0) {
+        if (!cd.classList.contains('warning')) {
+            cd.classList.add('warning');
+            // 每秒重新触发动画
+            const secInt = Math.floor(remaining);
+            cd.style.animation = 'none';
+            cd.offsetHeight; // reflow
+            cd.style.animation = 'timerPulse 0.5s ease-in-out';
+        }
+    } else if (remaining > 5) {
+        cd.classList.remove('warning');
+    }
+
+    if (remaining <= 0) {
+        cd.classList.add('warning');
+        endTimer();
+    }
+}
+
+function addTime(seconds) {
+    appState.timerStartTime += seconds * 1000;
+    document.getElementById('timer-countdown').classList.remove('warning');
+    flashEnergyBarsGreen();
+}
+
+function flashEnergyBarsGreen() {
+    const bars = document.querySelectorAll('#energy-bars .energy-bar');
+    bars.forEach(b => { b.style.background = 'var(--green)'; });
+    setTimeout(() => {
+        bars.forEach(b => { b.style.background = ''; });
+        updateEnergyBarsUI();
+    }, 400);
+}
+
+function updateEnergyBarsUI() {
+    const bars = document.querySelectorAll('#energy-bars .energy-bar');
+    bars.forEach((bar, i) => {
+        bar.classList.remove('filled');
+        if (i < appState.energyBars) bar.classList.add('filled');
+    });
+}
+
+function flashEnergyBars() {
+    const bars = document.querySelectorAll('#energy-bars .energy-bar');
+    bars.forEach(b => { b.style.background = 'var(--red)'; });
+    setTimeout(() => {
+        bars.forEach(b => { b.style.background = ''; });
+    }, 300);
+}
+
+function nextQuestionForTimer() {
+    if (!appState.timerRunning) return;
+    appState.answered = false;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = '';
+    document.getElementById('feedback-note').textContent = '';
+    document.getElementById('feedback-note').className = '';
+    document.getElementById('feedback-interval').textContent = '';
+    document.getElementById('feedback-interval').className = '';
+    document.getElementById('note-options').innerHTML = '';
+
+    delete appState.diffQuestions[appState.currentDiff];
+    loadQuestion();
+    appState.diffQuestions[appState.currentDiff] = appState.currentQuestion;
+    autoPlayCurrentQuestion();
+}
+
+function endTimer() {
+    appState.timerRunning = false;
+    clearInterval(appState.timerIntervalId);
+
+    // 恢复模式切换
+    document.querySelectorAll('#mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+    document.querySelectorAll('#timer-mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+
+    document.getElementById('timer-final-score').textContent = appState.timerScore;
+    document.getElementById('timer-result').style.display = '';
+    document.getElementById('chord-options').innerHTML = '';
+    document.getElementById('interval-options').innerHTML = '';
+    document.getElementById('note-options').innerHTML = '';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = '';
+    document.getElementById('next-btn').style.display = 'none';
+
+    // 隐藏题面和播放按钮
+    const replayBtns = [document.getElementById('replay-btn'), document.getElementById('replay-note-btn'), document.getElementById('replay-interval-btn')];
+    replayBtns.forEach(b => { if (b) b.style.display = 'none'; });
+
+    // 记录统计
+    if (appState.timerScore > stats.timerBest) stats.timerBest = appState.timerScore;
+    stats.timerGames++;
+    saveData();
+}
+
+function retryTimer() {
+    document.getElementById('timer-result').style.display = 'none';
+    document.querySelectorAll('#mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+    document.querySelectorAll('#timer-mode-selector .mode-btn').forEach(b => { b.disabled = false; });
+    startTimer();
+}
+
+function stopTimer() {
+    appState.timerRunning = false;
+    if (appState.timerIntervalId) clearInterval(appState.timerIntervalId);
+}
+
 // ==================== 初始化 ====================
 function init() {
     loadData();
@@ -1322,14 +2120,15 @@ function init() {
     renderPiano();
     updateScoreDisplay();
     loadChordQuestion();
+    appState.diffQuestions[appState.currentDiff] = appState.currentQuestion;
 
     // 难度按钮事件
     document.querySelectorAll('#difficulty-selector .diff-btn').forEach(btn => {
         btn.addEventListener('click', () => switchDifficulty(parseInt(btn.dataset.diff)));
     });
 
-    // 模式按钮事件
-    document.querySelectorAll('.mode-btn').forEach(btn => {
+    // 模式按钮事件（仅练习模式切换）
+    document.querySelectorAll('#mode-selector .mode-btn').forEach(btn => {
         btn.addEventListener('click', () => switchMode(btn.dataset.mode));
     });
 
@@ -1341,10 +2140,74 @@ function init() {
     // 下一题按钮
     document.getElementById('next-btn').addEventListener('click', nextQuestion);
 
-    // 播放按钮（三个模式共用 autoPlayCurrentQuestion）
-    document.getElementById('replay-btn').addEventListener('click', autoPlayCurrentQuestion);
-    document.getElementById('replay-note-btn').addEventListener('click', autoPlayCurrentQuestion);
-    document.getElementById('replay-interval-btn').addEventListener('click', autoPlayCurrentQuestion);
+    // 计时模式切换（segmented switch）
+    document.querySelectorAll('#timer-mode-selector .mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggleTimerMode(btn.dataset.timer === 'true'));
+    });
+
+    // 计时模式：播放按钮变"开始挑战"
+    document.getElementById('replay-btn').addEventListener('click', () => {
+        if (appState.timerActive && !appState.timerRunning) { startTimer(); return; }
+        autoPlayCurrentQuestion();
+    });
+    document.getElementById('replay-note-btn').addEventListener('click', () => {
+        if (appState.timerActive && !appState.timerRunning) { startTimer(); return; }
+        autoPlayCurrentQuestion();
+    });
+    document.getElementById('replay-interval-btn').addEventListener('click', () => {
+        if (appState.timerActive && !appState.timerRunning) { startTimer(); return; }
+        autoPlayCurrentQuestion();
+    });
+
+    document.getElementById('timer-retry-btn').addEventListener('click', retryTimer);
+
+    // 钢琴八度切换按钮
+    document.getElementById('octave-down-btn').addEventListener('click', () => {
+        if (settings.pianoOctave > 1) {
+            settings.pianoOctave--;
+            renderPiano();
+            updateOctaveLabel();
+            saveData();
+        }
+    });
+    document.getElementById('octave-up-btn').addEventListener('click', () => {
+        if (settings.pianoOctave < 4) {
+            settings.pianoOctave++;
+            renderPiano();
+            updateOctaveLabel();
+            saveData();
+        }
+    });
+    updateOctaveLabel();
+
+    // 和弦琶音间隔滑块
+    const arpeggioSlider = document.getElementById('arpeggio-slider');
+    function updateSliderFill() {
+        const pct = ((arpeggioSlider.value - arpeggioSlider.min) / (arpeggioSlider.max - arpeggioSlider.min)) * 100;
+        arpeggioSlider.style.background = 'linear-gradient(to right, var(--tint) ' + pct + '%, var(--border) ' + pct + '%)';
+    }
+    arpeggioSlider.addEventListener('input', e => {
+        document.getElementById('arpeggio-label').textContent = e.target.value + 'ms';
+        updateSliderFill();
+    });
+    updateSliderFill();
+
+    // 中文提示开关
+    const hintToggle = document.getElementById('hint-toggle');
+    if (!settings.showHints) hintToggle.classList.remove('active');
+    hintToggle.addEventListener('click', () => {
+        settings.showHints = !settings.showHints;
+        if (settings.showHints) {
+            hintToggle.classList.add('active');
+        } else {
+            hintToggle.classList.remove('active');
+        }
+        // 刷新当前和弦选项（如果有题目）
+        if (appState.currentQuestion && appState.currentQuestion.type === 'chord' && !appState.answered) {
+            renderChordOptions(appState.currentQuestion);
+        }
+        saveData();
+    });
 
     // 设置变更
     document.getElementById('set-wave').addEventListener('change', e => {
@@ -1377,11 +2240,14 @@ function init() {
             appState.totalCorrect = 0;
             appState.totalAttempts = 0;
             stats = {
-                beginner: { correct:0, total:0 },
-                intermediate: { correct:0, total:0 },
-                advanced: { correct:0, total:0 },
-                pro: { correct:0, total:0 },
+                beginner:     { correct:0, total:0, streak:0, bestStreak:0 },
+                intermediate: { correct:0, total:0, streak:0, bestStreak:0 },
+                advanced:     { correct:0, total:0, streak:0, bestStreak:0 },
+                pro:          { correct:0, total:0, streak:0, bestStreak:0 },
+                mixed:        { correct:0, total:0, streak:0, bestStreak:0 },
                 bestStreak: 0,
+                timerBest: 0,
+                timerGames: 0,
             };
             appState.currentDiff = 0;
             renderDifficultyButtons();
@@ -1389,6 +2255,12 @@ function init() {
             renderStatsPage();
             showToast('数据已重置');
         }
+    });
+
+    // 统计页重置按钮（事件委托）
+    document.getElementById('stats-detail').addEventListener('click', e => {
+        const btn = e.target.closest('[data-reset-diff]');
+        if (btn) resetDiffStats(parseInt(btn.dataset.resetDiff));
     });
 
     // 初始化主题
@@ -1403,6 +2275,7 @@ function applySettings() {
     document.getElementById('set-volume').value = Math.round(settings.volume * 100);
     document.getElementById('set-piano-size').value = settings.pianoSize;
     document.getElementById('set-theme').value = settings.theme;
+    updateOctaveLabel();
 }
 
 function applyTheme() {

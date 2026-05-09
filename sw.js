@@ -3,7 +3,7 @@
    实现离线缓存，支持 PWA 离线使用
    ======================================== */
 
-const CACHE_NAME = 'sound-practice-v1';
+const CACHE_NAME = 'sound-practice-v2';
 
 // 需要缓存的文件列表
 const urlsToCache = [
