@@ -1,0 +1,25 @@
+{
+    "name": "练耳与乐理",
+    "short_name": "练耳乐理",
+    "description": "移动端优先的练耳与乐理学习应用，支持和弦听辨、单音听辨、音程听辨",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#f2f2f7",
+    "theme_color": "#1a1a2e",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["education", "music"]
+}
